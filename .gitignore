@@ -1,0 +1,26 @@
+# Dependencies and build output
+node_modules/
+/.next/
+/out/
+/coverage/
+*.tsbuildinfo
+/clients/typescript/dist/
+# Images uploaded while running locally (production keeps them on the cms_media volume)
+/media/
+next-env.d.ts
+
+# Secrets: real values live in local .env files and in Coolify, never in git.
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+
+# Editors, OS and logs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+

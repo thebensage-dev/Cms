@@ -1,0 +1,33 @@
+# Rebuilt inside the image
+node_modules
+.next
+out
+coverage
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets: never sent to the Docker build. The Dockerfile writes its own .npmrc.
+.env
+.env.*
+!.env.example
+.npmrc
+.npmrc.example
+*.pem
+*.key
+
+# Not needed to build or run
+.git
+.github
+.idea
+.vscode
+*.md
+*.log
+Dockerfile
+.dockerignore
+
+# The TypeScript client is published on its own (cms-client.yml)
+clients/typescript/node_modules
+clients/typescript/dist
+clients/typescript/test
+clients/typescript/bin
+compose.yaml

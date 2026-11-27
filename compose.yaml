@@ -1,0 +1,64 @@
+# Production stack for Coolify: the CMS and its PostgreSQL. Deploy as one Coolify application
+# named "cms" (Docker Compose build pack, this repo, base directory /), and set the domain of the
+# "cms" service to https://cms.<your-domain>:3000 (the container port Coolify's proxy forwards
+# to; nothing is published on the host).
+#
+# Don't type values into Coolify: the deploy job in .github/workflows/ci.yml writes them (see
+# .env.example). The one exception is SERVICE_PASSWORD_64_CMSDB, a Coolify "magic" variable:
+# Coolify generates the database password on the first deploy and keeps it.
+#
+# Locally the whole platform, this CMS included, runs from ../Infrastructure/local/compose.yaml.
+services:
+  cms:
+    # Built and pushed by CI; the deploy job sets CMS_IMAGE_TAG to the commit's sha-<commit> tag.
+    image: ghcr.io/thebensage-dev/cms:${CMS_IMAGE_TAG:-main}
+    restart: unless-stopped
+    depends_on:
+      cms-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://cms:${SERVICE_PASSWORD_64_CMSDB}@cms-db:5432/cms
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET}
+      APP_URL: ${APP_URL:?set APP_URL}
+      # Sign-in through authentik (client "cms"): cms-editors and authentik Admins edit, cms-viewers
+      # look round.
+      OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:?set OIDC_ISSUER_URL}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-cms}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?set OIDC_CLIENT_SECRET}
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
+      # Shared with the sites: signs the admin's Preview links and lets the sites read drafts.
+      PREVIEW_SECRET: ${PREVIEW_SECRET:-}
+      # The admin's Preview button opens each page on its site.
+      PORTFOLIO_URL: ${PORTFOLIO_URL:-}
+      USER_DIRECTORY_URL: ${USER_DIRECTORY_URL:-}
+      # "true" for the first deploy only: adds the sites' current content to an empty database.
+      SEED_CONTENT: ${SEED_CONTENT:-false}
+    volumes:
+      # Persistent volume: the uploaded images (the Media collection). Back it up with cms_db.
+      # Never rename it: Coolify would start an empty one.
+      - cms_media:/app/media
+    expose:
+      - "3000"
+
+  cms-db:
+    image: postgres:18.7-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cms
+      POSTGRES_USER: cms
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_64_CMSDB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d cms -U cms"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    volumes:
+      # Persistent volume: every page, project and setting, with their versions. Back it up.
+      # Never rename it: Coolify would start an empty one. (PostgreSQL 18 keeps its data under
+      # /var/lib/postgresql/18.)
+      - cms_db:/var/lib/postgresql
+
+volumes:
+  cms_db:
+  cms_media:

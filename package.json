@@ -28,7 +28,7 @@
     "@payloadcms/richtext-lexical": "3.94.2",
     "@payloadcms/ui": "3.94.2",
     "@thebensage-dev/ui": "^1.4.0",
-    "graphql": "^16.15.0",
+    "graphql": "^17.1.0",
     "jose": "^6.2.18",
     "next": "16.4.6",
     "openid-client": "^6.9.1",

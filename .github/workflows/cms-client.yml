@@ -17,6 +17,7 @@ concurrency:
 
 permissions:
   contents: read
+  packages: read # install @thebensage-dev/ui (a dev dependency) from GitHub Packages
 
 jobs:
   check:

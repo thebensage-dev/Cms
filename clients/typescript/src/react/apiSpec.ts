@@ -88,8 +88,8 @@ export const fetchApiSpec = cache(async function fetchApiSpec(
   try {
     const res = await fetch(serverBase + specPath, {
       headers: { accept: "application/json, application/yaml;q=0.9, */*;q=0.5" },
-      next: { revalidate: 300 },
       signal: AbortSignal.timeout(5000),
+      ...({ next: { revalidate: 300 } } as object),
     });
     if (!res.ok) return null;
     const content = await res.text();

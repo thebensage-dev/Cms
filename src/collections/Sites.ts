@@ -7,15 +7,12 @@ import { COOKIES, FOOTER, HEADER_EXTRA } from "@/wording/interface";
 import { ACCESS, DELETE, ERROR_PAGE, FORM, REFUSALS, REQUEST_SENT } from "@/wording/userDirectory";
 
 /**
- * Every site is the same kind of record and can use the general blocks. A block set adds the
- * blocks that need a front end's own code (and any settings they need): Portfolio's sections, or
- * the User Directory's directory and profiles. A new site is a record here, with a front end that
- * reads it by its id and draws the blocks it offers.
+ * Every site is the same kind of record and can use every shared block. A block set adds blocks
+ * that need an app of their own in the site's front end: the User Directory's directory and
+ * profiles (they read and change users through the API). A new site is a record here, with a
+ * front end that reads it by its id.
  */
-export const BLOCK_SETS = [
-  { value: "portfolio", label: "Portfolio sections" },
-  { value: "user-directory", label: "User Directory" },
-] as const;
+export const BLOCK_SETS = [{ value: "user-directory", label: "User Directory app" }] as const;
 export type BlockSet = (typeof BLOCK_SETS)[number]["value"];
 
 /**

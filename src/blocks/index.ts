@@ -32,7 +32,7 @@ import { UserProfile } from "@/blocks/UserProfile";
 
 /** The groups of the "Add block" drawer, in order. */
 type DrawerGroup =
-  "Page tops" | "Text and images" | "Sections" | "Portfolio sections" | "User Directory";
+  "Page tops" | "Text and images" | "Sections" | "Showcase sections" | "User Directory";
 
 /** A label group (screen-reader words, button wording…), which goes in the block's Labels tab. */
 const isLabels = (field: Field) =>
@@ -83,7 +83,7 @@ function forEditors(block: Block, group: DrawerGroup): Block {
   };
 }
 
-/** Blocks both sites render. */
+/** Blocks every site can use (drawn by @thebensage-dev/cms-client/react). */
 export const sharedBlocks = [
   forEditors(PageHeader, "Page tops"),
   forEditors(LegalHeader, "Page tops"),
@@ -96,27 +96,24 @@ export const sharedBlocks = [
   forEditors(CardGrid, "Sections"),
   forEditors(Timeline, "Sections"),
   forEditors(CallToAction, "Sections"),
-];
-
-/** Blocks only Portfolio (the main site) renders. */
-export const portfolioBlocks = [
   forEditors(HomeHero, "Page tops"),
   forEditors(PageCards, "Sections"),
   forEditors(LinkCards, "Sections"),
   forEditors(PageTeaser, "Sections"),
-  forEditors(ProjectsGrid, "Portfolio sections"),
-  forEditors(PlatformTeaser, "Portfolio sections"),
-  forEditors(PlatformMap, "Portfolio sections"),
-  forEditors(Stack, "Portfolio sections"),
-  forEditors(Flows, "Portfolio sections"),
-  forEditors(AccessTable, "Portfolio sections"),
-  forEditors(AddressCards, "Portfolio sections"),
-  forEditors(EmailSenders, "Portfolio sections"),
-  forEditors(ThemeDemo, "Portfolio sections"),
-  forEditors(ApiReference, "Portfolio sections"),
+  forEditors(ProjectsGrid, "Showcase sections"),
+  forEditors(PlatformTeaser, "Showcase sections"),
+  forEditors(PlatformMap, "Showcase sections"),
+  forEditors(Stack, "Showcase sections"),
+  forEditors(Flows, "Showcase sections"),
+  forEditors(AccessTable, "Showcase sections"),
+  forEditors(AddressCards, "Showcase sections"),
+  forEditors(EmailSenders, "Showcase sections"),
+  forEditors(ThemeDemo, "Showcase sections"),
+  forEditors(ApiReference, "Showcase sections"),
 ];
 
-/** Blocks only the User Directory renders. */
+/** The User Directory app's blocks: they read and change users through the API, so only a site
+ *  with that app (the User Directory block set) can use them. */
 export const userDirectoryBlocks = [
   forEditors(DirectoryHero, "Page tops"),
   forEditors(UserDirectory, "User Directory"),

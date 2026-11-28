@@ -38,7 +38,6 @@ export const PlatformTeaser: Block = {
       type: "relationship",
       relationTo: "pages",
       required: true,
-      filterOptions: { "site.slug": { equals: "portfolio" } },
     },
   ],
 };

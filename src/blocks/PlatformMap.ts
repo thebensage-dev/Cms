@@ -47,7 +47,6 @@ export const PlatformMap: Block = {
               name: "page",
               type: "relationship",
               relationTo: "pages",
-              filterOptions: { "site.slug": { equals: "portfolio" } },
               admin: { width: "50%", condition: (_, sibling) => sibling?.address === "page" },
             },
           ],

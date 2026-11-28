@@ -29,7 +29,10 @@ describe("the seed content", () => {
   it.each(sites)("uses only blocks $site renders", ({ site, pages }) => {
     for (const page of pages) {
       for (const block of page.layout) {
-        expect(blocksFor([site]), `${page.path}: ${block.blockType}`).toContain(block.blockType);
+        expect(
+          blocksFor(site === "user-directory" ? [site] : []),
+          `${page.path}: ${block.blockType}`,
+        ).toContain(block.blockType);
       }
     }
   });

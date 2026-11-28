@@ -35,12 +35,12 @@ const parent = pageById(content, page?.parent);
 
 ## Drawing the blocks (`/react`)
 
-The general blocks (page header, legal header, text, image, image and text, columns, buttons, legal text, cards, timeline, call to action) look the same on every site, so they're drawn here. A site adds its own blocks to the registry and passes what they need:
+Every shared block (page tops, text and images, cards, timelines, the hero, projects, platform map, stack, theme demo, API reference…) is drawn here, the same on every site. A site passes what the blocks need through `ctx`: links, image and project addresses, sign-in state, the theme, and an API document viewer (Portfolio passes Scalar; without one the API reference shows its summary only). Blocks that need an app of their own (the User Directory's) are added by that site:
 
 ```tsx
 import { GENERAL_BLOCKS, RenderBlocks, type BlockContext } from "@thebensage-dev/cms-client/react";
 
-const BLOCKS = { ...GENERAL_BLOCKS, projectsGrid: ProjectsGridBlock };
+const BLOCKS = { ...GENERAL_BLOCKS, userDirectory: UserDirectoryBlock };
 
 const ctx: BlockContext = {
   content,

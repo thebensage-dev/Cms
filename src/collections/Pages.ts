@@ -2,7 +2,7 @@ import type { CollectionConfig, PayloadRequest } from "payload";
 import { editor, publishedOrSignedIn } from "@/access";
 import { previewSecret } from "@/auth/preview";
 import { previewQuery } from "../../clients/typescript/src/preview";
-import { portfolioBlocks, sharedBlocks, userDirectoryBlocks } from "@/blocks";
+import { sharedBlocks, userDirectoryBlocks } from "@/blocks";
 import { iconField } from "@/fields/icon";
 import { createBreadcrumbsField } from "@payloadcms/plugin-nested-docs";
 import { siteAddress, type BlockSet } from "@/collections/Sites";
@@ -26,7 +26,6 @@ async function siteOf(req: PayloadRequest, site: unknown): Promise<PageSite | un
 }
 
 const SET_BLOCKS: Record<BlockSet, string[]> = {
-  portfolio: portfolioBlocks.map((block) => block.slug),
   "user-directory": userDirectoryBlocks.map((block) => block.slug),
 };
 
@@ -105,7 +104,7 @@ export const Pages: CollectionConfig = {
               label: "Page content",
               labels: { singular: "Block", plural: "Blocks" },
               type: "blocks",
-              blocks: [...sharedBlocks, ...portfolioBlocks, ...userDirectoryBlocks],
+              blocks: [...sharedBlocks, ...userDirectoryBlocks],
               // Only the blocks the page's site renders (all of them until it has a site).
               filterOptions: async ({ data, req }) => {
                 const site = await siteOf(req, data?.site);

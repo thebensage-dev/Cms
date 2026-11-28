@@ -6,5 +6,11 @@ export { CmsButtons, type CmsButton } from "./CmsButtons.tsx";
 export { opt, type BlockContext, type BlockProps } from "./context.ts";
 export { GeneralSection, sectionClass } from "./GeneralSection.tsx";
 export { RefreshOnSave } from "./RefreshOnSave.tsx";
-export { GENERAL_BLOCKS, RenderBlocks, type BlockRegistry } from "./RenderBlocks.tsx";
+export {
+  FULL_WIDTH_BLOCKS,
+  GENERAL_BLOCKS,
+  RenderBlocks,
+  type BlockRegistry,
+} from "./RenderBlocks.tsx";
+export { fetchApiSpec, type ApiSpec, type AuthScheme } from "./apiSpec.ts";
 export { features, flowSteps, timelineSteps } from "./rows.ts";

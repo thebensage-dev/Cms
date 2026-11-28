@@ -1,5 +1,19 @@
 import type { ComponentType, ReactNode } from "react";
 import type { LayoutBlock } from "../content.ts";
+import { AccessTableBlock } from "./blocks/AccessTableBlock.tsx";
+import { AddressCardsBlock } from "./blocks/AddressCardsBlock.tsx";
+import { ApiReferenceBlock } from "./blocks/ApiReferenceBlock.tsx";
+import { EmailSendersBlock } from "./blocks/EmailSendersBlock.tsx";
+import { FlowsBlock } from "./blocks/FlowsBlock.tsx";
+import { HomeHeroBlock } from "./blocks/HomeHeroBlock.tsx";
+import { LinkCardsBlock } from "./blocks/LinkCardsBlock.tsx";
+import { PageCardsBlock } from "./blocks/PageCardsBlock.tsx";
+import { PageTeaserBlock } from "./blocks/PageTeaserBlock.tsx";
+import { PlatformMapBlock } from "./blocks/PlatformMapBlock.tsx";
+import { PlatformTeaserBlock } from "./blocks/PlatformTeaserBlock.tsx";
+import { ProjectsGridBlock } from "./blocks/ProjectsGridBlock.tsx";
+import { StackBlock } from "./blocks/StackBlock.tsx";
+import { ThemeDemoBlock } from "./blocks/ThemeDemoBlock.tsx";
 import { ButtonsBlock } from "./blocks/ButtonsBlock.tsx";
 import { CallToActionBlock } from "./blocks/CallToActionBlock.tsx";
 import { CardGridBlock } from "./blocks/CardGridBlock.tsx";
@@ -21,8 +35,8 @@ export type BlockRegistry<C extends BlockContext = BlockContext> = {
 };
 
 /**
- * The blocks every site can use (the CMS's GENERAL_BLOCKS), drawn the same way everywhere. A site
- * adds its own: `{ ...GENERAL_BLOCKS, projectsGrid: ProjectsGridBlock }`.
+ * Every block any site can use, drawn the same way everywhere. A site that has more (the User
+ * Directory's directory and profiles) adds them: `{ ...GENERAL_BLOCKS, userDirectory: … }`.
  */
 export const GENERAL_BLOCKS: BlockRegistry = {
   pageHeader: PageHeaderBlock,
@@ -36,7 +50,24 @@ export const GENERAL_BLOCKS: BlockRegistry = {
   cardGrid: CardGridBlock,
   timeline: TimelineBlock,
   callToAction: CallToActionBlock,
+  accessTable: AccessTableBlock,
+  addressCards: AddressCardsBlock,
+  apiReference: ApiReferenceBlock,
+  emailSenders: EmailSendersBlock,
+  flows: FlowsBlock,
+  homeHero: HomeHeroBlock,
+  linkCards: LinkCardsBlock,
+  pageCards: PageCardsBlock,
+  pageTeaser: PageTeaserBlock,
+  platformMap: PlatformMapBlock,
+  platformTeaser: PlatformTeaserBlock,
+  projectsGrid: ProjectsGridBlock,
+  stack: StackBlock,
+  themeDemo: ThemeDemoBlock,
 };
+
+/** Blocks that span the whole width, outside a wide or narrow page's centred column. */
+export const FULL_WIDTH_BLOCKS: ReadonlySet<BlockType> = new Set<BlockType>(["stack"]);
 
 /** A page's blocks in order, each drawn by its component. A type with none renders nothing. */
 export function RenderBlocks<C extends BlockContext>({

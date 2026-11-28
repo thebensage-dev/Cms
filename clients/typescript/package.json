@@ -1,6 +1,6 @@
 {
   "name": "@thebensage-dev/cms-client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Typed, cached reader for TheBensage CMS (Payload), with a snapshot fallback so the site renders while the CMS is down, and its blocks drawn with SharedUI for Next.js sites (/react).",
   "license": "MIT",
   "repository": {

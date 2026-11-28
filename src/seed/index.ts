@@ -95,7 +95,7 @@ export async function seedIfEmpty(payload: Payload): Promise<void> {
       data: {
         ...withoutLinks(settings[site]),
         slug: site,
-        blockSets: [site],
+        blockSets: site === "user-directory" ? [site] : [],
         subdomain: SUBDOMAIN[site],
       } as never,
     });

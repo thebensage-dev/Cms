@@ -15,7 +15,6 @@ export const PageTeaser: Block = {
       type: "relationship",
       relationTo: "pages",
       required: true,
-      filterOptions: { "site.slug": { equals: "portfolio" } },
       admin: { description: "Shows the icons and titles of this page's first card grid." },
     },
     text("linkLabel", { required: true }),

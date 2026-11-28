@@ -144,7 +144,7 @@ export interface Site {
   /**
    * The general blocks are always there. Add a set only if the site's front end draws it.
    */
-  blockSets?: ("portfolio" | "user-directory")[] | null;
+  blockSets?: "user-directory"[] | null;
   /**
    * Its front end reads the site's pages with this id. Set once.
    */

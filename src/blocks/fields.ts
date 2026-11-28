@@ -36,7 +36,6 @@ export const pagesField = (name = "pages", label?: string): Field => ({
   relationTo: "pages",
   hasMany: true,
   required: true,
-  filterOptions: { "site.slug": { equals: "portfolio" } },
   admin: {
     description: "Shown as cards with each page's card label, summary and icon (its Card tab).",
   },

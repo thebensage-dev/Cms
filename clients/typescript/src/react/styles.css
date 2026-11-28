@@ -1,2 +1,16 @@
 /* Lets the site's Tailwind see the classes the CMS block components use. */
 @source "./";
+
+@layer components {
+  /* The shared tone-card gives the coloured edge and hover border; this adds the lift. */
+  .project-card {
+    transition:
+      border-color 150ms,
+      box-shadow 150ms,
+      transform 150ms;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}

@@ -35,8 +35,13 @@ jobs:
           node-version-file: clients/typescript/.nvmrc
           cache: npm
           cache-dependency-path: clients/typescript/package-lock.json
+          registry-url: https://npm.pkg.github.com
+          scope: "@thebensage-dev"
+      # The React components are type-checked against @thebensage-dev/ui (a dev dependency).
       - name: Install dependencies
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check (generated files, types, tests, build)
         run: npm run check
 
@@ -90,6 +95,8 @@ jobs:
       - name: Install dependencies
         if: steps.version.outputs.publish == 'true'
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish to GitHub Packages
         if: steps.version.outputs.publish == 'true'
         env:

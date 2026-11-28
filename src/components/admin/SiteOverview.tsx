@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Payload } from "payload";
-import { siteBaseUrl } from "@/collections/Sites";
+import { siteAddress } from "@/collections/Sites";
 import type { Page, Site } from "@/payload-types";
 
 const box: React.CSSProperties = {
@@ -53,7 +53,7 @@ export default async function SiteOverview({ payload }: { payload: Payload }) {
         }}
       >
         {(sites.docs as Site[]).map((site) => {
-          const base = siteBaseUrl(site.slug);
+          const base = siteAddress(site);
           return (
             <div key={site.id} style={box}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>

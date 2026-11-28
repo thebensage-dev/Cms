@@ -28,6 +28,9 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@payloadcms/*"
         update-types: ["version-update:semver-major"]
+      # Payload 3 supports graphql 16 only; move with Payload.
+      - dependency-name: graphql
+        update-types: ["version-update:semver-major"]
     groups:
       # Payload's packages are released together and must stay on the same version.
       payload:

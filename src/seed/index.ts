@@ -7,6 +7,11 @@ import { userDirectoryPages, userDirectorySettings } from "@/seed/userDirectory"
 
 type Site = "portfolio" | "user-directory";
 
+const SUBDOMAIN: Record<Site, string | undefined> = {
+  portfolio: undefined,
+  "user-directory": "users",
+};
+
 const WIDTH = { home: "full", standard: "wide", legal: "narrow" } as const;
 
 /** The page's blocks, starting with its header block (from the seed's `intro`). */
@@ -86,7 +91,13 @@ export async function seedIfEmpty(payload: Payload): Promise<void> {
     const doc = await payload.create({
       collection: "sites",
       ...local,
-      data: { ...withoutLinks(settings[site]), slug: site } as never,
+      // Each site uses its own block set; the User Directory lives on users.<domain>.
+      data: {
+        ...withoutLinks(settings[site]),
+        slug: site,
+        blockSets: [site],
+        subdomain: SUBDOMAIN[site],
+      } as never,
     });
     siteIds.set(site, doc.id as number);
   }

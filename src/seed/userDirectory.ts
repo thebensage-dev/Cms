@@ -12,7 +12,7 @@ const OWNER = "TheBensage";
 export const userDirectorySettings = {
   label: "User Directory",
   name: "User Directory",
-  description:
+  headline:
     "A searchable user directory built with Next.js and React, on a .NET API with PostgreSQL.",
   interface: {
     header: wordingDefaults(HEADER_EXTRA),

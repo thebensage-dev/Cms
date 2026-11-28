@@ -1,7 +1,6 @@
 import type { Media, Page, Project, Site as SiteRecord } from "./types.ts";
 
-/** The front ends the CMS holds content for: each is a site record (its `slug`), which its pages
- *  belong to. */
+/** A site's id (its record's `slug`): its pages belong to it, and its front end reads it by it. */
 export type Site = SiteRecord["slug"];
 
 /** `T` with the keys `K` present and not null. */
@@ -10,14 +9,17 @@ type Directory = NonNullable<SiteRecord["directory"]>;
 
 /**
  * A site's settings: its site record (name, header, footer, the words every page shares), with
- * the fields the CMS requires for that kind of site typed as present.
+ * the optional fields Portfolio's and the User Directory's front ends rely on typed as present
+ * (their records fill them in).
  */
 export type SettingsFor<S extends Site> = S extends "portfolio"
   ? Filled<SiteRecord, "role" | "email" | "headline" | "githubUrl"> & { slug: "portfolio" }
-  : Filled<SiteRecord, "description"> & {
-      slug: "user-directory";
-      directory: Filled<Directory, "contactEmail">;
-    };
+  : S extends "user-directory"
+    ? SiteRecord & {
+        slug: "user-directory";
+        directory: Filled<Directory, "contactEmail">;
+      }
+    : SiteRecord;
 
 /** One block of a page's layout. */
 export type LayoutBlock = NonNullable<Page["layout"]>[number];

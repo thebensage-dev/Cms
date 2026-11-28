@@ -5,31 +5,45 @@ import { previewQuery } from "../../clients/typescript/src/preview";
 import { portfolioBlocks, sharedBlocks, userDirectoryBlocks } from "@/blocks";
 import { iconField } from "@/fields/icon";
 import { createBreadcrumbsField } from "@payloadcms/plugin-nested-docs";
-import { siteBaseUrl, type SiteKind } from "@/collections/Sites";
+import { siteAddress, type BlockSet } from "@/collections/Sites";
 
-/** The kind of site a page belongs to (its site field holds the site's id). */
-async function siteKind(req: PayloadRequest, site: unknown): Promise<SiteKind | undefined> {
+type PageSite = { blockSets?: BlockSet[] | null; subdomain?: string | null };
+
+/** The site a page belongs to (its site field holds the site's id): its block sets and subdomain. */
+async function siteOf(req: PayloadRequest, site: unknown): Promise<PageSite | undefined> {
   const id = typeof site === "object" && site ? (site as { id: number }).id : site;
   if (typeof id !== "number" && typeof id !== "string") return undefined;
   const doc = await req.payload
-    .findByID({ collection: "sites", id, depth: 0, req, select: { slug: true } })
+    .findByID({
+      collection: "sites",
+      id,
+      depth: 0,
+      req,
+      select: { blockSets: true, subdomain: true },
+    })
     .catch(() => null);
-  return (doc?.slug as SiteKind | undefined) ?? undefined;
+  return doc ? { blockSets: doc.blockSets as BlockSet[], subdomain: doc.subdomain } : undefined;
 }
 
-/** Which blocks each kind of site renders, so an editor can only add ones that will show up. */
-export const BLOCKS_BY_SITE: Record<SiteKind, string[]> = {
-  portfolio: [...sharedBlocks, ...portfolioBlocks].map((block) => block.slug),
-  "user-directory": [...sharedBlocks, ...userDirectoryBlocks].map((block) => block.slug),
+const SET_BLOCKS: Record<BlockSet, string[]> = {
+  portfolio: portfolioBlocks.map((block) => block.slug),
+  "user-directory": userDirectoryBlocks.map((block) => block.slug),
 };
+
+/** The blocks a site offers: the general ones, plus its block sets', so an editor can only add
+ *  blocks its front end draws. */
+export const blocksFor = (sets: readonly BlockSet[] | null | undefined): string[] => [
+  ...sharedBlocks.map((block) => block.slug),
+  ...(sets ?? []).flatMap((set) => SET_BLOCKS[set] ?? []),
+];
 
 /**
  * The admin's Preview button: the page on its site, showing this page's latest draft. A signed
  * link to the site's /preview route, which turns on its draft mode (needs PREVIEW_SECRET here and
  * on the site); without the secret, the published page.
  */
-export function previewUrl(kind: unknown, path: unknown): string | null {
-  const origin = siteBaseUrl(kind);
+export function previewUrl(site: PageSite | undefined, path: unknown): string | null {
+  const origin = siteAddress(site);
   if (!origin || typeof path !== "string") return null;
   // A page for many addresses (/users/[id]) previews as its first one (/users/1).
   const address = path.replace(/\[[a-z]+\]/g, "1");
@@ -38,7 +52,7 @@ export function previewUrl(kind: unknown, path: unknown): string | null {
 }
 
 /**
- * Every page of both sites. A page is a list of blocks (Layout), from its header to its last
+ * Every page of every site. A page is a list of blocks (Layout), from its header to its last
  * section, each drawn by the matching component on the site, in a column as wide as Width says. The sites route by `path`, so a new page here is
  * a new page there. Drafts stay private until published.
  */
@@ -52,11 +66,11 @@ export const Pages: CollectionConfig = {
     group: "Content",
     description:
       "The pages of the site picked at the top of the menu, each built from blocks. Published changes show on the site within a minute.",
-    preview: async (doc, { req }) => previewUrl(await siteKind(req, doc.site), doc.path),
+    preview: async (doc, { req }) => previewUrl(await siteOf(req, doc.site), doc.path),
     // The page itself beside the editor, updating as you type (the site refreshes on each
     // autosave; see RefreshOnSave in the sites).
     livePreview: {
-      url: async ({ data, req }) => previewUrl(await siteKind(req, data?.site), data?.path) ?? "",
+      url: async ({ data, req }) => previewUrl(await siteOf(req, data?.site), data?.path) ?? "",
       breakpoints: [
         { name: "mobile", label: "Phone", width: 390, height: 844 },
         { name: "tablet", label: "Tablet", width: 820, height: 1180 },
@@ -94,8 +108,8 @@ export const Pages: CollectionConfig = {
               blocks: [...sharedBlocks, ...portfolioBlocks, ...userDirectoryBlocks],
               // Only the blocks the page's site renders (all of them until it has a site).
               filterOptions: async ({ data, req }) => {
-                const kind = await siteKind(req, data?.site);
-                return kind ? BLOCKS_BY_SITE[kind] : true;
+                const site = await siteOf(req, data?.site);
+                return site ? blocksFor(site.blockSets) : true;
               },
               admin: {
                 initCollapsed: true,

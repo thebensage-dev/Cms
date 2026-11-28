@@ -196,8 +196,8 @@ jobs:
       APP_ENV_AUTH_SECRET: derive:cms-session
       # Draft preview: the same derived value as in Portfolio's and the User Directory's pipelines.
       APP_ENV_PREVIEW_SECRET: derive:cms-preview
-      APP_ENV_PORTFOLIO_URL: https://${{ vars.DOMAIN }}
-      APP_ENV_USER_DIRECTORY_URL: https://users.${{ vars.DOMAIN }}
+      # The main domain: each site is on its subdomain of it (the Site's Subdomain setting).
+      APP_ENV_SITES_URL: https://${{ vars.DOMAIN }}
       # "true" for the first deploy only (the sites' current content); empty values are skipped.
       APP_ENV_SEED_CONTENT: ${{ vars.SEED_CONTENT }}
     steps:

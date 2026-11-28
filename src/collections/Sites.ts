@@ -6,30 +6,48 @@ import { linkGroup } from "@/fields/link";
 import { COOKIES, FOOTER, HEADER_EXTRA } from "@/wording/interface";
 import { ACCESS, DELETE, ERROR_PAGE, FORM, REFUSALS, REQUEST_SENT } from "@/wording/userDirectory";
 
-/** The front ends the CMS feeds. A site record is one of them: adding another needs its app. */
-export const SITE_KINDS = [
-  { value: "portfolio", label: "Portfolio (the main site)" },
+/**
+ * Every site is the same kind of record and can use the general blocks. A block set adds the
+ * blocks that need a front end's own code (and any settings they need): Portfolio's sections, or
+ * the User Directory's directory and profiles. A new site is a record here, with a front end that
+ * reads it by its id and draws the blocks it offers.
+ */
+export const BLOCK_SETS = [
+  { value: "portfolio", label: "Portfolio sections" },
   { value: "user-directory", label: "User Directory" },
 ] as const;
-export type SiteKind = (typeof SITE_KINDS)[number]["value"];
+export type BlockSet = (typeof BLOCK_SETS)[number]["value"];
 
-/** Where each kind of site lives (for Preview and the address shown in the admin). */
-export const siteBaseUrl = (kind: unknown): string | undefined =>
-  (kind === "portfolio" ? process.env.PORTFOLIO_URL : process.env.USER_DIRECTORY_URL)?.replace(
-    /\/$/,
-    "",
-  );
+/**
+ * Where a site is published: its subdomain on SITES_URL (the main domain's address, such as
+ * https://thebensage.com, or http://localhost:8080 in the local stack). Only the subdomain is
+ * stored, so the same content works in every environment.
+ */
+export function siteAddress(
+  site: { subdomain?: string | null } | null | undefined,
+): string | undefined {
+  const base = process.env.SITES_URL?.replace(/\/+$/, "");
+  if (!base || !site) return undefined;
+  if (!site.subdomain) return base;
+  const url = new URL(base);
+  url.hostname = `${site.subdomain}.${url.hostname}`;
+  return url.origin;
+}
 
-/** Shown only on that kind of site's record. */
-const onlyFor = (kind: SiteKind): { condition: Condition } => ({
-  condition: (data) => data?.slug === kind,
+const uses = (data: unknown, set: BlockSet) =>
+  Array.isArray((data as { blockSets?: unknown })?.blockSets) &&
+  (data as { blockSets: string[] }).blockSets.includes(set);
+
+/** Shown only on a site that uses that block set. */
+const onlyWith = (set: BlockSet): { condition: Condition } => ({
+  condition: (data) => uses(data, set),
 });
 
-/** Required on that kind of site only (a conditional field can't be NOT NULL in Postgres). */
-const requiredFor =
-  (kind: SiteKind) =>
-  (value: unknown, { data }: { data: Partial<{ slug: string }> }) =>
-    data?.slug !== kind || (value !== undefined && value !== null && value !== "") || "Required.";
+/** Required only on a site that uses that block set (a conditional field can't be NOT NULL). */
+const requiredWith =
+  (set: BlockSet) =>
+  (value: unknown, { data }: { data: unknown }) =>
+    !uses(data, set) || (value !== undefined && value !== null && value !== "") || "Required.";
 
 const rowLabel = { components: { RowLabel: "@/components/admin/RowLabel" } } as const;
 
@@ -105,14 +123,45 @@ const generalTab: Tab = {
           admin: { width: "50%", description: "The site's name, in its header and page titles." },
         },
         {
-          name: "slug",
-          label: "Front end",
+          name: "blockSets",
+          label: "Extra blocks",
           type: "select",
+          hasMany: true,
+          options: [...BLOCK_SETS],
+          admin: {
+            width: "50%",
+            description:
+              "The general blocks are always there. Add a set only if the site's front end draws it.",
+          },
+        },
+      ],
+    },
+    {
+      type: "row",
+      fields: [
+        {
+          name: "slug",
+          label: "Site id",
+          type: "text",
           required: true,
           unique: true,
-          options: [...SITE_KINDS],
-          admin: { width: "50%", description: "Which app shows this site. Set once." },
+          validate: (value: unknown) =>
+            (typeof value === "string" && /^[a-z][a-z0-9-]*$/.test(value)) ||
+            "Lowercase letters, digits and dashes, such as my-site.",
+          admin: {
+            width: "50%",
+            description: "Its front end reads the site's pages with this id. Set once.",
+          },
           access: { update: () => false },
+        },
+        {
+          name: "subdomain",
+          type: "text",
+          validate: (value: unknown) =>
+            !value ||
+            (typeof value === "string" && /^[a-z0-9-]+$/.test(value)) ||
+            "Lowercase letters, digits and dashes, such as users.",
+          admin: { width: "50%", description: "Empty for the main domain itself." },
         },
       ],
     },
@@ -122,53 +171,38 @@ const generalTab: Tab = {
       virtual: true,
       admin: {
         readOnly: true,
-        description: "Where this site is published (from the server's settings).",
+        description: "Where this site is published: its subdomain on this environment's domain.",
       },
-      hooks: { afterRead: [({ data }) => siteBaseUrl(data?.slug) ?? "Not set here"] },
+      hooks: { afterRead: [({ data }) => siteAddress(data) ?? "Not set here (SITES_URL)"] },
     },
-    // Portfolio
+    {
+      name: "headline",
+      label: "Description",
+      type: "textarea",
+      required: true,
+      admin: { description: "The default meta description and the link preview's text." },
+    },
     {
       type: "row",
-      admin: onlyFor("portfolio"),
       fields: [
         {
           name: "role",
           type: "text",
-          validate: requiredFor("portfolio"),
-          admin: { width: "50%", description: "On the link preview image." },
+          admin: { width: "33%", description: "Optional: on the link preview image." },
         },
         {
           name: "email",
           label: "Contact email",
           type: "email",
-          validate: requiredFor("portfolio"),
-          admin: { width: "50%" },
+          admin: { width: "33%", description: "Optional: for contact links." },
+        },
+        {
+          name: "githubUrl",
+          label: "GitHub",
+          type: "text",
+          admin: { width: "34%", description: "Optional: the source code's home." },
         },
       ],
-    },
-    {
-      name: "headline",
-      type: "text",
-      validate: requiredFor("portfolio"),
-      admin: {
-        ...onlyFor("portfolio"),
-        description: "The default meta description and the link preview image's text.",
-      },
-    },
-    {
-      name: "githubUrl",
-      label: "GitHub organisation",
-      type: "text",
-      validate: requiredFor("portfolio"),
-      admin: onlyFor("portfolio"),
-    },
-    // User Directory
-    {
-      name: "description",
-      label: "Meta description",
-      type: "textarea",
-      validate: requiredFor("user-directory"),
-      admin: onlyFor("user-directory"),
     },
   ],
 };
@@ -228,7 +262,7 @@ const directoryTab: Tab = {
   name: "directory",
   description:
     "The add/edit form, the delete dialog and the access messages, shared by the directory and the profile pages.",
-  admin: onlyFor("user-directory"),
+  admin: onlyWith("user-directory"),
   fields: [
     {
       type: "row",
@@ -237,7 +271,7 @@ const directoryTab: Tab = {
           name: "contactEmail",
           label: "Access requests by email",
           type: "email",
-          validate: requiredFor("user-directory"),
+          validate: requiredWith("user-directory"),
           admin: { width: "50%", description: "Where the “email me” links go." },
         },
         {

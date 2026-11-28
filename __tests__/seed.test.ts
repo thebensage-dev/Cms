@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BLOCKS_BY_SITE } from "@/collections/Pages";
+import { blocksFor } from "@/collections/Pages";
 import { brandLogo } from "@/fields/brandLogo";
 import { ICONS } from "@/fields/icon";
 import { richText } from "@/seed/lexical";
@@ -29,7 +29,7 @@ describe("the seed content", () => {
   it.each(sites)("uses only blocks $site renders", ({ site, pages }) => {
     for (const page of pages) {
       for (const block of page.layout) {
-        expect(BLOCKS_BY_SITE[site], `${page.path}: ${block.blockType}`).toContain(block.blockType);
+        expect(blocksFor([site]), `${page.path}: ${block.blockType}`).toContain(block.blockType);
       }
     }
   });

@@ -1,6 +1,5 @@
 import type { AuthStrategy } from "payload";
-import { readAuthEnv } from "@/auth/env";
-import { cookieFrom, readSession, roleFor, SESSION_COOKIE } from "@/auth/session";
+import { auth, roleFor } from "@/auth/session";
 
 /**
  * Payload's only way in: every admin and API request is authenticated from the authentik session
@@ -11,12 +10,7 @@ import { cookieFrom, readSession, roleFor, SESSION_COOKIE } from "@/auth/session
 export const authentikStrategy: AuthStrategy = {
   name: "authentik",
   async authenticate({ headers, payload }) {
-    const env = readAuthEnv();
-    if (!env) return { user: null };
-    const session = await readSession(
-      cookieFrom(headers.get("cookie"), SESSION_COOKIE),
-      env.secret,
-    );
+    const session = await auth.sessionFromHeaders(headers);
     const role = session && roleFor(session.groups);
     if (!session || !role) return { user: null };
     const found = await payload.find({

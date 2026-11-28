@@ -8,5 +8,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["__tests__/**/*.test.ts"],
+    // Our packages import Next by its bare paths (next/headers), which only a bundler resolves.
+    server: { deps: { inline: ["@thebensage-dev/auth", "@thebensage-dev/cms-client"] } },
   },
 });

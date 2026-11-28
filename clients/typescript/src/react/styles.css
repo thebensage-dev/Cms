@@ -1,0 +1,2 @@
+/* Lets the site's Tailwind see the classes the CMS block components use. */
+@source "./";

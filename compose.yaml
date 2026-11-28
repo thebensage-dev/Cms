@@ -28,9 +28,8 @@ services:
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
       # Shared with the sites: signs the admin's Preview links and lets the sites read drafts.
       PREVIEW_SECRET: ${PREVIEW_SECRET:-}
-      # The admin's Preview button opens each page on its site.
-      PORTFOLIO_URL: ${PORTFOLIO_URL:-}
-      USER_DIRECTORY_URL: ${USER_DIRECTORY_URL:-}
+      # The main domain's address: each site is on its subdomain of it (Preview, the site list).
+      SITES_URL: ${SITES_URL:-}
       # "true" for the first deploy only: adds the sites' current content to an empty database.
       SEED_CONTENT: ${SEED_CONTENT:-false}
     volumes:

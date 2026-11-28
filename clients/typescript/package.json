@@ -1,7 +1,7 @@
 {
   "name": "@thebensage-dev/cms-client",
-  "version": "0.1.0",
-  "description": "Typed, cached reader for TheBensage CMS (Payload): a site's pages, projects and settings, with a snapshot fallback so the site renders while the CMS is down.",
+  "version": "0.2.0",
+  "description": "Typed, cached reader for TheBensage CMS (Payload), with a snapshot fallback so the site renders while the CMS is down, and its blocks drawn with SharedUI for Next.js sites (/react).",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -9,12 +9,19 @@
     "directory": "clients/typescript"
   },
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./styles.css": "./dist/react/styles.css",
     "./package.json": "./package.json"
   },
   "bin": {
@@ -36,13 +43,44 @@
     "generate:check": "node scripts/generate.mjs --check",
     "typecheck": "tsc --noEmit",
     "test": "node --test",
-    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json && node -e \"require('fs').copyFileSync('src/react/styles.css','dist/react/styles.css')\"",
     "check": "npm run generate:check && npm run typecheck && npm run test && npm run build",
     "prepack": "npm run build"
   },
   "devDependencies": {
+    "@payloadcms/live-preview-react": "^3.94.2",
+    "@thebensage-dev/ui": "^1.4.0",
     "@types/node": "^26.6.11",
+    "@types/react": "^19.3.3",
+    "lucide-react": "^1.82.0",
+    "next": "^16.4.6",
     "prettier": "^3.10.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "~6.0.3"
+  },
+  "peerDependencies": {
+    "@payloadcms/live-preview-react": "^3.0.0",
+    "@thebensage-dev/ui": "^1.4.0",
+    "lucide-react": ">=1.0.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@payloadcms/live-preview-react": {
+      "optional": true
+    },
+    "@thebensage-dev/ui": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   }
 }

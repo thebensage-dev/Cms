@@ -142,24 +142,37 @@ export interface Site {
    */
   name: string;
   /**
-   * Which app shows this site. Set once.
+   * The general blocks are always there. Add a set only if the site's front end draws it.
    */
-  slug: "portfolio" | "user-directory";
+  blockSets?: ("portfolio" | "user-directory")[] | null;
   /**
-   * Where this site is published (from the server's settings).
+   * Its front end reads the site's pages with this id. Set once.
+   */
+  slug: string;
+  /**
+   * Empty for the main domain itself.
+   */
+  subdomain?: string | null;
+  /**
+   * Where this site is published: its subdomain on this environment's domain.
    */
   address?: string | null;
   /**
-   * On the link preview image.
+   * The default meta description and the link preview's text.
+   */
+  headline: string;
+  /**
+   * Optional: on the link preview image.
    */
   role?: string | null;
+  /**
+   * Optional: for contact links.
+   */
   email?: string | null;
   /**
-   * The default meta description and the link preview image's text.
+   * Optional: the source code's home.
    */
-  headline?: string | null;
   githubUrl?: string | null;
-  description?: string | null;
   header?: {
     nav?:
       | {
@@ -3063,13 +3076,14 @@ export interface PayloadMigration {
 export interface SitesSelect<T extends boolean = true> {
   label?: T;
   name?: T;
+  blockSets?: T;
   slug?: T;
+  subdomain?: T;
   address?: T;
+  headline?: T;
   role?: T;
   email?: T;
-  headline?: T;
   githubUrl?: T;
-  description?: T;
   header?:
     | T
     | {
